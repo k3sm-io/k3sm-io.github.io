@@ -1,17 +1,94 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<title>k3sm.io</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f7f7f8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0a0b0d" media="(prefers-color-scheme: dark)">
+<title>k3sm</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%230b0c0e'/%3E%3Ctext%20x='16'%20y='22'%20font-family='ui-monospace,monospace'%20font-size='18'%20fill='%23f5f5f5'%20text-anchor='middle'%3Ek%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#f7f7f8;
+    --ink:#0b0c0e;
+    --muted:#6b7177;
+    --line:#e4e6ea;
+    --grid:rgba(0,0,0,.035);
+    --accent:#3b5bdb;
+    --glow:rgba(59,91,219,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0a0b0d;
+      --ink:#f3f4f6;
+      --muted:#9aa1a9;
+      --line:#23262c;
+      --grid:rgba(255,255,255,.035);
+      --accent:#6d8bff;
+      --glow:rgba(109,139,255,.10);
+    }
+  }
+  *{box-sizing:border-box}
+  html{height:100%}
+  body{
+    margin:0;
+    min-height:100vh;
+    min-height:100svh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px;
+    background-color:var(--bg);
+    color:var(--ink);
+    font-family:system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    background-image:
+      radial-gradient(72% 55% at 50% 26%, var(--glow), transparent 70%),
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size:100% 100%, 46px 46px, 46px 46px;
+    background-position:center;
+    background-attachment:fixed;
+  }
+  .frame{width:100%;max-width:680px}
+  .top,.bottom{display:flex;align-items:center;justify-content:space-between}
+  .wordmark{
+    display:inline-flex;align-items:center;gap:.6ch;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-weight:600;font-size:18px;letter-spacing:.02em;
+  }
+  .wordmark::before{
+    content:"";width:9px;height:9px;border-radius:2px;
+    background:var(--accent);display:inline-block;
+  }
+  .rule{border:0;height:1px;background:var(--line);margin:22px 0}
+  .content{padding:52px 2px 60px}
+  .headline{
+    margin:0;font-weight:600;
+    font-size:clamp(30px,6vw,46px);
+    line-height:1.08;letter-spacing:-.02em;
+  }
+  .subline{
+    margin:20px 0 0;color:var(--muted);
+    font-size:clamp(15px,2.4vw,17px);letter-spacing:.01em;
+  }
+  .bottom{color:var(--muted);font-size:13px;letter-spacing:.02em}
+</style>
 </head>
 <body>
-<h1>k3sm — Kubernetes for macOS, natively</h1>
-<p>Go modules under <code>k3sm.io</code> (source on <a href="https://github.com/k3sm-io">github.com/k3sm-io</a>):</p>
-<ul>
-<li><code>k3sm.io/k3sm</code> — distribution</li>
-<li><code>k3sm.io/runtimed</code> — native runtime</li>
-<li><code>k3sm.io/darwin-net</code> — pod networking</li>
-<li><code>k3sm.io/apis</code> — shared contracts</li>
-</ul>
+<main class="frame">
+  <header class="top">
+    <span class="wordmark">k3sm</span>
+  </header>
+  <hr class="rule">
+  <section class="content">
+    <h1 class="headline">Developer infrastructure,<br>reimagined.</h1>
+    <p class="subline">Currently in private development.</p>
+  </section>
+  <hr class="rule">
+  <footer class="bottom"><span>© 2026 k3sm</span></footer>
+</main>
 </body>
 </html>
