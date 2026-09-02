@@ -1,0 +1,7 @@
+# RFC 9116. Report a vulnerability privately -- please do NOT open a public issue.
+Contact: https://github.com/k3sm-io/k3sm/security/advisories/new
+Contact: mailto:kitsumiko@k3sm.io
+Expires: 2027-08-30T05:40:13Z
+Policy: https://k3sm.io/security/
+Preferred-Languages: en
+Canonical: https://k3sm.io/.well-known/security.txt
