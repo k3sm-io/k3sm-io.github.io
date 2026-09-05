@@ -27,7 +27,7 @@ moves — two replicas started weeks apart would then serve different weights un
 k3sm points it at that revision&rsquo;s directory <strong>inside the cache volume</strong> instead:</p><ul><li><code>revision</code> requires <code>cache</code>. Without a cache volume there is no such directory, and the model is
 rejected up front with an <code>InvalidSpec</code> reason rather than served from the moving default branch.</li><li>A pinned revision is loaded from the cache, not fetched into it. On a volume that has never held this
 model, leave <code>revision</code> empty for the first start (the engine downloads the default branch), or stage
-the weights into the volume yourself — <code>hack/acceptance/m8.sh</code> does the latter.</li></ul><p><code>quantization</code> is rejected today: the engine has no expression for it, and serving a different variant
+the weights into the volume yourself.</li></ul><p><code>quantization</code> is rejected today: the engine has no expression for it, and serving a different variant
 than the one asked for would look like success. Name the quantized repository in <code>model</code> instead —
 <code>mlx-community/Qwen3-0.6B-4bit</code> already does.</p><h2 id=3-watch-it-become-ready>3. Watch It Become Ready<a class=anchor href=#3-watch-it-become-ready aria-label="permalink to this section">#</a></h2><p>The first start downloads the weights, which can take a while on a cold cache — unless <code>revision</code> is
 pinned, in which case they must already be in the volume (above). Read the <strong>conditions</strong>,
