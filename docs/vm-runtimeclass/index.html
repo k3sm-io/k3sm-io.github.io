@@ -19,8 +19,8 @@ accounting, and in-guest networking — the guest leases an address on the node&
 resolves cluster DNS, reaches ClusterIP Services, and is itself reachable through its own
 Service&rsquo;s ClusterIP on the same node. See <a href=/docs/limitations/>Limitations</a> for the full measured
 picture, including what is still not wired.</p><p>It ships <strong><code>linux/arm64</code> only</strong> (<code>linux/amd64</code> needs in-guest translation
-and is held for a later release); its live lab run is green against the release
-artifact. This path is single-node.</p></blockquote><h2 id=when-to-use-it>When to Use It<a class=anchor href=#when-to-use-it aria-label="permalink to this section">#</a></h2><p>Use <code>vm</code> when a workload must not share the <code>_k3sm</code> trust domain with its neighbors — untrusted code,
+and is held for a later release); it passes against the release
+build. This path is single-node.</p></blockquote><h2 id=when-to-use-it>When to Use It<a class=anchor href=#when-to-use-it aria-label="permalink to this section">#</a></h2><p>Use <code>vm</code> when a workload must not share the <code>_k3sm</code> trust domain with its neighbors — untrusted code,
 tenant isolation, or anything you would isolate with a strong boundary on Linux. See
 <a href=/docs/limitations/>Limitations</a> for what is measured and what is not yet wired. This
 is the same framing as <a href=/docs/concepts/>Concepts</a>: the default native path is <strong>not</strong> a security

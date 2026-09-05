@@ -117,7 +117,7 @@ is unset (the API&rsquo;s &ldquo;default implementation&rdquo; case) and ignores
 entirely — it neither binds its ports nor writes its status. k3sm publishes no class of its own, so
 there is no value to opt into. <code>spec.allocateLoadBalancerNodePorts</code> needs nothing from k3sm: the
 apiserver owns allocation, and k3sm&rsquo;s listeners key off whether a nodePort was assigned.
-Note that setting it to <code>false</code> does not deallocate an already-assigned nodePort — that is upstream
+Setting it to <code>false</code> does not deallocate an already-assigned nodePort — that is upstream
 behaviour, not a k3sm limitation. A Service&rsquo;s nodePort stays reachable regardless of its class, which
 is also upstream behaviour.</p><p>Two further consequences of the LB/Ingress datapath: the userspace
 splice <strong>discards the client address</strong> when it dials the backend, so a NetworkPolicy denying a pod
@@ -175,8 +175,8 @@ and a failed <code>postStart</code> hook restart the container through the same 
 (non-sidecar) init container that fails under <code>Always</code> / <code>OnFailure</code> is not re-run in place — the Pod
 does not proceed, and a controller replacing the Pod is what unsticks it.</p><p><strong>On <code>--runtime hostprocess</code>, <code>restartPolicy</code> is not honored at all.</strong> An exited container is reaped
 once and never respawned, whatever the Pod or container policy says. If you are on that opt-out, a
-process that exits stays exited until a <code>Deployment</code>/<code>Job</code> controller replaces the Pod.</p><h3 id=vm-runtimeclass-multi-node-and-ha-status><code>vm</code> RuntimeClass, Multi-Node, and HA Status<a class=anchor href=#vm-runtimeclass-multi-node-and-ha-status aria-label="permalink to this section">#</a></h3><ul><li>The <strong><code>vm</code> RuntimeClass</strong> (running Linux images in a per-Pod micro-VM) boots and runs a Pod
-end to end — create-to-Running restarts measure a 165 ms median (the figures
+process that exits stays exited until a <code>Deployment</code>/<code>Job</code> controller replaces the Pod.</p><h3 id=vm-runtimeclass-multi-node-and-ha-status><code>vm</code> RuntimeClass, Multi-Node, and HA Status<a class=anchor href=#vm-runtimeclass-multi-node-and-ha-status aria-label="permalink to this section">#</a></h3><ul><li>The <strong><code>vm</code> RuntimeClass</strong> (running Linux images in a per-Pod micro-VM) boots and runs a Pod —
+create-to-Running restarts measure a 165 ms median (the figures
 below), and one idle Pod with a 512 MiB guest costs about <strong>46 MB of host memory</strong>,
 because the hypervisor allocates guest RAM lazily rather than reserving it. The guest kernel and
 initramfs are digest-pinned and verified on every node start. What is measured is single-node,
@@ -184,7 +184,7 @@ and a multi-image Pod is not supported — every container in a
 <code>vm</code> Pod shares one root filesystem, so a Pod naming two different images runs the second
 container&rsquo;s command against the first container&rsquo;s image. It ships
 <strong><code>linux/arm64</code> only</strong> (<code>linux/amd64</code> needs in-guest translation and is held for a later
-release); its live lab run is green against the release artifact. See
+release); it passes against the release build. See
 <a href=/docs/vm-runtimeclass/><code>vm</code> RuntimeClass</a>.</li><li><strong>Multi-node and HA</strong> ship as documented <strong>EXPERIMENTAL</strong> and are not launch-blocking; their
 de-EXPERIMENTAL graduation is the <strong>v0.3</strong> milestone. See <a href=/docs/multi-node/>Multi-node</a> and
 <a href=/docs/ha/>HA</a>.</li></ul><h3 id=vm-pods-node-selection-and-security-context-admission><code>vm</code> Pods: Node Selection and Security-Context Admission<a class=anchor href=#vm-pods-node-selection-and-security-context-admission aria-label="permalink to this section">#</a></h3><p>Two admission facts trip people up on the <code>vm</code> path specifically.</p><p><strong>The node is still darwin — select it as one.</strong> A <code>vm</code> Pod runs a Linux guest, but the <em>node</em> it
@@ -207,7 +207,7 @@ the guest, or keep that workload on the native path where the same restriction a
 <code>restartPolicy</code> acting on it means tearing the micro-VM down and creating a new one, not restarting a
 process inside a surviving one. That recreate is fast — cold boot
 (VM create to first console output) came in at a median of <strong>165 ms</strong> (p95 171 ms, N=20), and kernel
-start to init exec at a median of <strong>50 ms</strong>. Say it plainly for planning purposes: on this path,
+start to init exec at a median of <strong>50 ms</strong>, on an M1 Ultra Mac Studio. On this path,
 <strong>container restart is pod recreate</strong>, and it is cheap enough that a <code>CrashLoopBackOff</code> cycle behaves
 the same way it would on the native path.</p><h3 id=vm-pods-linuxarm64-only><code>vm</code> Pods: <code>linux/arm64</code> Only<a class=anchor href=#vm-pods-linuxarm64-only aria-label="permalink to this section">#</a></h3><p>The <code>vm</code> path runs <strong><code>linux/arm64</code></strong> guest images. It does not run <code>linux/amd64</code> in this release —
 in-guest translation for that architecture is a planned follow-up, not something you can opt into

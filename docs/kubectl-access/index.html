@@ -25,7 +25,7 @@ the cluster with no <code>KUBECONFIG</code> export at all:</p><div class=highlig
 </span></span></code></pre></div><p>To get the kubeconfig somewhere else — a second machine, a CI secret, a file of its own — use
 <strong><code>k3sm kubeconfig</code></strong>, which prints the admin kubeconfig on stdout, or merges it into a file you name:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>k3sm kubeconfig &gt; ~/k3sm.yaml                  <span class=c1># print it</span>
 </span></span><span class=line><span class=cl>k3sm kubeconfig --write --path ~/other.yaml    <span class=c1># merge it into another kubeconfig</span>
-</span></span></code></pre></div><p>Note that apart from choosing those credentials, <code>k3sm kubectl</code> is a <strong>pure passthrough</strong> to the
+</span></span></code></pre></div><p>Apart from choosing those credentials, <code>k3sm kubectl</code> is a <strong>pure passthrough</strong> to the
 bundled <code>kubectl</code> — every subcommand under it is the upstream one, and none of them knows anything
 about k3sm&rsquo;s own layout. <code>k3sm kubeconfig</code> is the k3sm-specific verb, and it finds the cluster the
 same two ways <code>k3sm kubectl</code> does.</p><p>Because the control plane is a <strong>real upstream kube-apiserver</strong>, standard clients, RBAC, and API
