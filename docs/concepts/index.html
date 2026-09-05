@@ -20,8 +20,8 @@ CRDs, workload controllers, and the scheduler all work. What differs is the <str
 conditions, probes, graceful stop, the <code>/stats/summary</code> observability surface) on top of native
 processes rather than a container runtime.</p><h2 id=trust-domain--one-_k3sm-user>Trust Domain — One <code>_k3sm</code> User<a class=anchor href=#trust-domain--one-_k3sm-user aria-label="permalink to this section">#</a></h2><p>All Pods on a node run as the <strong>same unprivileged <code>_k3sm</code> user</strong>. There is <strong>no per-pod uid isolation</strong>;
 same-node Pods share one OS trust domain. For untrusted or multi-tenant workloads the <strong><code>vm</code>
-RuntimeClass</strong> is the intended isolation boundary — it boots a Pod into its own micro-VM,
-validated on real hardware. See <a href=/docs/vm-runtimeclass/><code>vm</code> RuntimeClass</a>. The rationale lives in
+RuntimeClass</strong> is the intended isolation boundary — it boots a Pod into its own micro-VM.
+See <a href=/docs/vm-runtimeclass/><code>vm</code> RuntimeClass</a>. The rationale lives in
 <a href=https://github.com/k3sm-io/k3sm/blob/main/docs/privilege-model.md rel="noopener external">the privilege model</a>. This is the same framing you will see in
 <a href=/docs/limitations/>Limitations</a>.</p><h2 id=images>Images<a class=anchor href=#images aria-label="permalink to this section">#</a></h2><p>k3sm workloads are OCI images whose payload is a <strong>native Darwin executable</strong>. Registry pull,
 tags, digests, pull policy and pull secrets work as in any Kubernetes; <code>k3sm build</code> builds any

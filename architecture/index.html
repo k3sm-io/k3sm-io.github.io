@@ -68,8 +68,7 @@ and reaches the helper over a uid-authenticated unix socket carrying a closed, t
 renders every system-command argument itself and re-validates every parameter; it never executes
 client-supplied text.</p><p>The one-time cost is a single administrator step at install. After that, day-to-day use needs no
 <code>sudo</code>. The residual limitation is written up on <a href=/docs/limitations/>limitations</a>: no per-Pod
-uid isolation, so untrusted workloads belong in the <code>vm</code> RuntimeClass — a per-Pod micro-VM boundary
-that boots and reaches Running today.</p><h2 id=packaging>Packaging<a class=anchor href=#packaging aria-label="permalink to this section">#</a></h2><p>k3sm ships as an app-bundle-wrapped root LaunchDaemon, installed and removed with
+uid isolation, so untrusted workloads belong in the <code>vm</code> RuntimeClass — a per-Pod micro-VM boundary.</p><h2 id=packaging>Packaging<a class=anchor href=#packaging aria-label="permalink to this section">#</a></h2><p>k3sm ships as an app-bundle-wrapped root LaunchDaemon, installed and removed with
 <code>launchctl bootstrap</code> / <code>bootout</code>. Two launchd identities come out of the one signed binary: the root
 networking helper, and the server running as <code>_k3sm</code>, boot-surviving so a headless Mac&rsquo;s cluster
 comes back after a reboot.</p><p>The code-running entitlements that let the runtime execute

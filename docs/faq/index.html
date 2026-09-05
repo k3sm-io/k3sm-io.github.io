@@ -13,7 +13,7 @@ cgroups, CNI, and network namespaces — k3sm has none of them. See <a href=/doc
 <a href=/docs/vm-runtimeclass/><code>vm</code> RuntimeClass</a> runs <code>linux/arm64</code> Pods in a per-Pod micro-VM to isolate
 untrusted workloads — see <a href=/docs/limitations/>Limitations</a>.</p><h2 id=can-i-run-my-existing-dockeroci-linux-images>Can I Run My Existing Docker/OCI Linux Images?<a class=anchor href=#can-i-run-my-existing-dockeroci-linux-images aria-label="permalink to this section">#</a></h2><p>No, on the default path — those carry a Linux userland, and a k3sm Pod there is a Darwin process.
 An unmodified <code>linux/arm64</code> image (or a multi-arch image that includes it) runs instead under the
-<a href=/docs/vm-runtimeclass/><code>vm</code> RuntimeClass</a>, validated on real hardware, single-node. Outside that path
+<a href=/docs/vm-runtimeclass/><code>vm</code> RuntimeClass</a>, single-node. Outside that path
 a Linux image is refused at pull, naming the platforms it offers and the one this node needs;
 <code>linux/amd64</code> is refused on both paths today.</p><p>You can still use images, and the usual toolchain around them: build a <code>darwin/arm64</code> binary,
 package it with <code>k3sm build</code>, then <code>k3sm image load</code> it or <code>k3sm image push</code> it to a registry the
@@ -26,8 +26,7 @@ reaps an exited container without respawning it. See
 SRV and PTR all resolve from inside a Pod. Two caveats: the resolver is k3sm&rsquo;s own, not CoreDNS
 (IPv4/A only, no AAAA), and the <code>getaddrinfo</code> shim that redirects a Pod&rsquo;s lookups <strong>cannot load into
 a SIP platform binary</strong> such as <code>/bin/sh</code>, so shell-script lookups fall back to the host resolver.
-In-pod cluster DNS is <strong>not</strong> wired on <code>--runtime hostprocess</code>; on the <code>vm</code> RuntimeClass it works,
-validated on real hardware. See
+In-pod cluster DNS is <strong>not</strong> wired on <code>--runtime hostprocess</code>; on the <code>vm</code> RuntimeClass it works. See
 <a href=/docs/limitations/#dns--what-resolves-and-on-which-runtime-path>Limitations</a>.</p><h2 id=do-udp-services-work>Do UDP Services Work?<a class=anchor href=#do-udp-services-work aria-label="permalink to this section">#</a></h2><p>Only cluster DNS on <code>:53</code>. General UDP Services (ClusterIP and NodePort) are deferred. See
 <a href=/docs/limitations/>Limitations</a>.</p><h2 id=are-pods-isolated-from-each-other>Are Pods Isolated From Each Other?<a class=anchor href=#are-pods-isolated-from-each-other aria-label="permalink to this section">#</a></h2><p>Not by uid — same-node Pods share one <code>_k3sm</code> trust domain. The <a href=/docs/vm-runtimeclass/><code>vm</code> RuntimeClass</a>
 is the intended boundary for untrusted workloads — see

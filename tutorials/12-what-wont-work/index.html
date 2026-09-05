@@ -59,7 +59,7 @@ a one-line change:</p><div class=highlight><pre tabindex=0 class=chroma><code cl
 </span></span></code></pre></div><p>Then point <code>command[0]</code> at the darwin build. Pods get the full treatment regardless of how the
 binary was produced: Seatbelt confinement, probes, volume mounts, and memory limits.</p><p><strong>For code you cannot rebuild, the <code>vm</code> RuntimeClass boots it in its own guest instead.</strong> A Pod that
 names <code>runtimeClassName: vm</code> boots a <code>linux/arm64</code> OCI image in a per-pod micro-VM and reaches
-Running — running end to end on real hardware. The guest kernel and initramfs are fetched from a
+Running. The guest kernel and initramfs are fetched from a
 pinned release and digest-verified on every start. The path is single-node.
 <code>linux/amd64</code> does not run — that needs
 in-guest Rosetta translation, held for a later release. See

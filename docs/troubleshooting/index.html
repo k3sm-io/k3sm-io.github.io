@@ -48,8 +48,7 @@ names, SRV and PTR all resolve. Check these in order:</p><ul><li><strong>Is the 
 them and their lookups go to the <strong>host</strong> resolver. Do the lookup from your compiled workload
 instead — this is a substrate ceiling, not a misconfiguration.</li><li><strong>Is the Pod&rsquo;s <code>dnsPolicy</code> <code>Default</code> or <code>None</code>?</strong> Neither selects cluster DNS, so nothing is
 injected. Use <code>ClusterFirst</code> (the default when the field is unset).</li><li><strong>Is it an AAAA lookup?</strong> k3sm&rsquo;s CIDRs are IPv4; AAAA is never answered.</li><li><strong>Are you on <code>--runtime hostprocess</code>?</strong> In-pod cluster DNS is not wired there — every lookup goes
-to the host resolver. The <code>vm</code> RuntimeClass is not this gap: cluster DNS works there, validated on
-real hardware.</li></ul><p>See <a href=/docs/limitations/#dns--what-resolves-and-on-which-runtime-path>Limitations</a> for the full
+to the host resolver. The <code>vm</code> RuntimeClass is not this gap: cluster DNS works there.</li></ul><p>See <a href=/docs/limitations/#dns--what-resolves-and-on-which-runtime-path>Limitations</a> for the full
 per-path picture.</p><h2 id=udp-service-failures>UDP Service Failures<a class=anchor href=#udp-service-failures aria-label="permalink to this section">#</a></h2><p>Only cluster DNS on <code>:53</code> uses UDP today; general UDP Services (ClusterIP <strong>and</strong> NodePort) are deferred.
 See <a href=/docs/limitations/>Limitations</a>.</p><h2 id=loadbalancer-stuck-pending>LoadBalancer Stuck <code>&lt;pending></code><a class=anchor href=#loadbalancer-stuck-pending aria-label="permalink to this section">#</a></h2><p><strong>Do not look in the unified log for this one.</strong> The LoadBalancer controller and the ingress host log
 through <code>slog</code> to <strong>stderr</strong>, which the launchd job routes to a file — the
@@ -102,7 +101,7 @@ mismatch?</strong> (<code>kubectl describe pod</code> — this is never <code>Im
 <strong>advertised but not yet honored</strong> at pull. Multi-arch selection itself works — k3sm reads the
 manifest list and picks a platform — but <code>linux/amd64</code> is not among the platforms it will accept
 on either path today: the guest path itself (<code>runtimeClassName: vm</code>, <code>linux/arm64</code>) is built and
-validated, but the node&rsquo;s VM host attaches no Rosetta directory share to its guests, so nothing
+works, but the node&rsquo;s VM host attaches no Rosetta directory share to its guests, so nothing
 inside a guest could translate an amd64 payload yet. So an amd64-only image is refused at pull
 rather than started and left to crash. That is a documented gap, not a broken node; see
 <a href=/docs/vm-runtimeclass/#rosetta-labels-advertised-only><code>vm</code> RuntimeClass</a>.</li></ol><h2 id=multi-node-join-fails>Multi-Node Join Fails<a class=anchor href=#multi-node-join-fails aria-label="permalink to this section">#</a></h2><ul><li>Re-mint the token (<code>sudo k3sm token create</code>) — tokens expire.</li><li>Confirm the agent can reach the server on <code>6443</code> and the wireguard mesh is up. See
