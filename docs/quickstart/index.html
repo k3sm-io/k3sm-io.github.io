@@ -26,9 +26,11 @@ admin kubeconfig to your home directory. After that, day-to-day use needs <stron
 <a href=/docs/install/>Install</a> for the install-channel generations and the script&rsquo;s options.</p><h2 id=2-confirm-the-cluster-is-up>2. Confirm the Cluster Is Up<a class=anchor href=#2-confirm-the-cluster-is-up aria-label="permalink to this section">#</a></h2><p><strong>Do not run <code>k3sm server</code> yourself.</strong> The install step registered the <code>io.k3sm.server</code> LaunchDaemon
 with <code>RunAtLoad</code> and <code>KeepAlive</code>, so the control plane and the node are <strong>already running</strong> and will
 come back after a reboot. A second, foreground <code>k3sm server</code> would contend with it for the work
-directory and the apiserver port.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>launchctl print system/io.k3sm.server <span class=p>|</span> head -5   <span class=c1># the daemon launchd is running</span>
-</span></span><span class=line><span class=cl>kubectl get nodes                                 <span class=c1># one Ready darwin node</span>
-</span></span></code></pre></div><p>Install merged an admin context into your <code>~/.kube/config</code>, so your own <code>kubectl</code> reaches the cluster
+directory and the apiserver port.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>k3sm status         <span class=c1># one screen: daemons, apiserver, node, workloads, data root</span>
+</span></span><span class=line><span class=cl>kubectl get nodes   <span class=c1># one Ready darwin node</span>
+</span></span></code></pre></div><p>The <code>install</code> row names the two LaunchDaemons: they are what makes the cluster survive a reboot, and
+<code>k3sm status</code> is how you check they came back. Its exit code is the verdict, so a script can branch
+on it — <code>k3sm status --help</code> lists the codes.</p><p>Install merged an admin context into your <code>~/.kube/config</code>, so your own <code>kubectl</code> reaches the cluster
 with no further setup. See <a href=/docs/kubectl-access/>kubectl access</a> for the details, and
 <a href=/docs/install/>Install</a> for what the daemons do.</p><blockquote><p>Running a <strong>foreground</strong> cluster instead (no daemons, for a throwaway experiment)? Then skip step 1
 entirely and run <code>k3sm server</code> in a terminal — never both.</p></blockquote><h2 id=3-run-a-native-binary-as-a-pod>3. Run a Native Binary as a Pod<a class=anchor href=#3-run-a-native-binary-as-a-pod aria-label="permalink to this section">#</a></h2><p>k3sm workloads are native Darwin executables, not OCI Linux images — see <a href=/docs/images/>Images</a>.

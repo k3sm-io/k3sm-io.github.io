@@ -15,7 +15,12 @@ node</strong>. In a <a href=/docs/multi-node/>multi-node</a> cluster this means 
 data lives — plan placement accordingly.</p><h2 id=capacity-is-best-effort>Capacity Is Best-Effort<a class=anchor href=#capacity-is-best-effort aria-label="permalink to this section">#</a></h2><p>PersistentVolume data and the kine datastore share one APFS volume, so a volume that grows without
 bound can fill the disk the datastore sits on. <code>capacity.storage</code> records what the claim asked for; it
 is not a quota. Over-commit is not refused when the volume binds — it surfaces later as a write
-failure (<code>ENOSPC</code>) inside the Pod.</p><h2 id=every-claim-must-name-the-class>Every Claim Must Name the Class<a class=anchor href=#every-claim-must-name-the-class aria-label="permalink to this section">#</a></h2><p><code>local-path</code> is <strong>not</strong> marked as the cluster&rsquo;s default StorageClass. That is deliberate: a PVC that did
+failure (<code>ENOSPC</code>) inside the Pod.</p><p>Keeping the data root on its own volume is the way to bound that. A separate volume is declared in
+<code>/etc/fstab</code> — the only supported way to attach one — and must be mounted before the daemons start:
+they refuse to run against a mountpoint with nothing mounted on it, because writing into the bare
+directory would put a second, empty datastore on the boot disk and hide the real volume&rsquo;s contents.
+<code>k3sm status</code> names that state (<code>data-root not-mounted</code>) and prints the mount command; see
+<a href=/docs/troubleshooting/>Troubleshooting</a> for the full recovery.</p><h2 id=every-claim-must-name-the-class>Every Claim Must Name the Class<a class=anchor href=#every-claim-must-name-the-class aria-label="permalink to this section">#</a></h2><p><code>local-path</code> is <strong>not</strong> marked as the cluster&rsquo;s default StorageClass. That is deliberate: a PVC that did
 not ask for node-local storage is never silently bound to a volume that pins its Pod to one machine.</p><p>The practical consequence is that <strong><code>storageClassName: local-path</code> is required on every PVC</strong>. A claim
 that omits it matches no class, stays <code>Pending</code> indefinitely, and the Pod that mounts it reports
 <code>pod has unbound immediate PersistentVolumeClaims</code> — which names the symptom, not this cause.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>kubectl get storageclass    <span class=c1># local-path, with no (default) marker — by design</span>
