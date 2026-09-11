@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#f7f7f8" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0a0b0d" media="(prefers-color-scheme: dark)">
 <meta name="robots" content="noindex">
-<title>k3sm — install</title>
+<title>k3sm: install</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%230b0c0e'/%3E%3Ctext%20x='16'%20y='22'%20font-family='ui-monospace,monospace'%20font-size='18'%20fill='%23f5f5f5'%20text-anchor='middle'%3Ek%3C/text%3E%3C/svg%3E">
 <style>
   :root{
@@ -113,21 +113,21 @@
     <pre><code>curl -fsSL https://k3sm.io/install.sh | sh</code></pre>
 
     <div class="note">
-      <p><strong>Status:</strong> no k3sm release is published yet. Until the first tagged
-      release exists, the script stops cleanly with a &ldquo;has a release been published
-      yet?&rdquo; message and installs nothing.</p>
+      <p><strong>Status:</strong> pre-release builds are published; the script resolves the
+      newest one, and a pin via <code>K3SM_INSTALL_VERSION</code> always wins. The Homebrew
+      tap and the <code>.pkg</code> arrive with the first stable release.</p>
     </div>
 
     <h2>What the script does</h2>
     <ol>
       <li><strong>Preflight.</strong> Verifies Apple silicon (even from a Rosetta shell) and
-        macOS&nbsp;26+ — anything else stops before a byte is downloaded.</li>
+        macOS&nbsp;26+. Anything else stops before a byte is downloaded.</li>
       <li><strong>Fetch.</strong> Downloads the versioned release tarball and its checksums
         file from <code>github.com/k3sm-io/k3sm</code> Releases.</li>
       <li><strong>Verify.</strong> Checks the tarball&rsquo;s SHA-256 against the published
-        checksums entry. Any mismatch — or a missing entry — aborts before anything runs.</li>
+        checksums entry. Any mismatch, or a missing entry, aborts before anything runs.</li>
       <li><strong>Tell you exactly what happens next.</strong> Prints the resolved version,
-        the tarball&rsquo;s SHA-256, and what the install step will do — <em>before</em> any
+        the tarball&rsquo;s SHA-256, and what the install step will do, <em>before</em> any
         privilege is requested.</li>
       <li><strong><code>sudo k3sm install</code>.</strong> The one-time admin step: creates the
         root-owned <code>/Library/k3sm</code>, the unprivileged <code>_k3sm</code> service
@@ -138,32 +138,32 @@
 
     <div class="note">
       <p><strong>This script escalates.</strong> Step 5 runs under <code>sudo</code> and will
-      prompt for your password (unless your sudo credentials are already cached — the banner
+      prompt for your password (unless your sudo credentials are already cached; the banner
       in step 4 prints either way). If you would rather look first, verify without
       installing:</p>
     </div>
     <pre><code>curl -fsSL https://k3sm.io/install.sh | K3SM_INSTALL_DOWNLOAD_ONLY=1 sh</code></pre>
     <p>That downloads and SHA-256-verifies the tarball into the current directory and never
     invokes <code>sudo</code>. Inspect it, then <code>tar -xzf</code> and run
-    <code>sudo ./k3sm install</code> yourself. You can also read the script itself — its
+    <code>sudo ./k3sm install</code> yourself. You can also read the script itself. Its
     SHA-256 as served here is:</p>
-    <p class="hash"><code>8e54258e741e9d4874fb1aa286862704e538febd055c0dd7a3aaa14f933402e3</code></p>
+    <p class="hash"><code>dd2c6b36e8047ecbf5bf489b2194980cce7909e585811c428953d1f6a4975f48</code></p>
     <p>and the canonical copy lives at
-    <code>github.com/k3sm-io/k3sm/install.sh</code> — same bytes, different origin, so the
+    <code>github.com/k3sm-io/k3sm/install.sh</code>, same bytes from a different origin, so the
     two can be compared out-of-band.</p>
-    <p><strong>Verification scope:</strong> the SHA-256 check proves integrity — the tarball
-    matches its published checksums — not publisher identity. Identity (Developer&nbsp;ID +
+    <p><strong>Verification scope:</strong> the SHA-256 check confirms integrity (the tarball
+    matches its published checksums), not publisher identity. Identity (Developer&nbsp;ID +
     notarization) arrives with the <code>.pkg</code> generation below.</p>
 
     <h2>Upgrades, repair, rollback</h2>
     <ul>
       <li><strong>Upgrade:</strong> re-run the one-liner. Both LaunchDaemons restart briefly;
         cluster state is preserved.</li>
-      <li><strong>Repair without upgrading:</strong> an unpinned re-run jumps to latest — pin
+      <li><strong>Repair without upgrading:</strong> an unpinned re-run jumps to latest, so pin
         the version you are on:
         <code>K3SM_INSTALL_VERSION=v0.1.0&nbsp;sh</code>.</li>
       <li><strong>Rollback:</strong> pin the prior release tag and re-run.</li>
-      <li><strong>Remove:</strong> <code>sudo k3sm uninstall</code> — removes everything the
+      <li><strong>Remove:</strong> <code>sudo k3sm uninstall</code> removes everything the
         install created (it is idempotent, and safe after a failed or partial install).</li>
     </ul>
 
@@ -171,16 +171,16 @@
     <p>This installer is <strong>generation&nbsp;1</strong> of k3sm&rsquo;s distribution
     ladder, and it ships first:</p>
     <ol>
-      <li><code>curl -fsSL https://k3sm.io/install.sh | sh</code> — checksum-verified
+      <li><code>curl -fsSL https://k3sm.io/install.sh | sh</code>: a checksum-verified
         tarball, handed to the first-class <code>sudo k3sm install</code>.</li>
-      <li><code>brew install k3sm-io/tap/k3sm</code> — the Homebrew tap.</li>
-      <li>A signed, notarized, stapled <code>.pkg</code> — full publisher provenance, for
+      <li><code>brew install k3sm-io/tap/k3sm</code>: the Homebrew tap.</li>
+      <li>A signed, notarized, stapled <code>.pkg</code>: full publisher provenance, for
         offline and managed installs.</li>
     </ol>
     <p><strong>Switching channels</strong> (script&nbsp;&rarr;&nbsp;brew or back) is safe:
     every channel manages the same <code>/Library/k3sm</code>. Run
     <code>sudo k3sm install</code> after switching so the daemons run the newly delivered
-    binary — or <code>sudo k3sm uninstall</code> first for a clean cutover.</p>
+    binary, or run <code>sudo k3sm uninstall</code> first for a clean cutover.</p>
   </section>
   <hr class="rule">
   <footer class="bottom"><span>© 2026 k3sm</span></footer>
