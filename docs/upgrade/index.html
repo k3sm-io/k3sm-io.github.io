@@ -38,8 +38,8 @@ converted back if you reinstall the older k3sm.</p><p>You do not have to do anyt
 <code>kine.pre-&lt;kine-version></code>. The mechanics (the WAL drain, the integrity check, the write-once
 rule) are in <a href=/docs/backup-restore/>Backup & restore</a>.</li><li>It <strong>refuses to start</strong> if the volume does not have twice the database size free, rather than
 writing a partial backup. Free space and start it again; nothing was changed.</li><li>The first boot on the new engine is slower than usual (the checkpoint + the copy). Later boots are not.</li><li>Keep the <code>.bak</code> until you are satisfied with the new release, then delete it. It is a full copy
-of the database.</li></ul><p>On the <a href=/docs/ha/>HA</a> Postgres setup none of this applies. The datastore is your Postgres, and its
-backup is <code>pg_dump</code>/PITR on your schedule.</p><h2 id=upgrading-into-the-reserved-port-policy>Upgrading Into the Reserved-Port Policy<a class=anchor href=#upgrading-into-the-reserved-port-policy aria-label="permalink to this section">#</a></h2><p>The release that moved LoadBalancer listeners to the wildcard also provisions a
+of the database.</li></ul><p>A server started with <code>--cluster-init</code> keeps its state in an embedded etcd member instead, and none
+of this applies there. A multi-server control plane is not available in v0.1.6; see <a href=/docs/ha/>HA</a>.</p><h2 id=upgrading-into-the-reserved-port-policy>Upgrading Into the Reserved-Port Policy<a class=anchor href=#upgrading-into-the-reserved-port-policy aria-label="permalink to this section">#</a></h2><p>The release that moved LoadBalancer listeners to the wildcard also provisions a
 <code>ValidatingAdmissionPolicy</code> that <strong>rejects</strong> a <code>type: LoadBalancer</code> Service declaring a port k3sm&rsquo;s own
 listeners own, either the NodePort range <code>30000-32767</code> or the kubelet API port <code>10250</code>. It matches on
 CREATE <strong>and</strong> UPDATE, and it does <strong>not</strong> ratchet on <code>oldObject</code>.</p><p>That means a cluster <strong>already carrying</strong> such a Service is not grandfathered in. The object stays in
@@ -68,9 +68,10 @@ moved it:</p><div class=highlight><pre tabindex=0 class=chroma><code class=langu
 </span></span></code></pre></div><p>Anything listed has two ways out:</p><ul><li>Publish it on a different <code>spec.ports[].port</code>. This is the intended fix, since no pod can reach the
 Service on the current one.</li><li>Start the server with a different <code>--kine-port</code>, which moves the denied number. That is a server
 restart, and it changes the port anything else of yours uses to reach the datastore.</li></ul><p>One limit: the policy is a single cluster-scoped object carrying the ports of the server that
-provisioned it, while <code>--kine-port</code> is per server. In an HA set whose servers use different datastore
-ports, the policy names one of them. A Service on another server&rsquo;s port is admitted by the API and is
-still unreachable from the pods on that server&rsquo;s node.</p><h2 id=rollback>Rollback<a class=anchor href=#rollback aria-label="permalink to this section">#</a></h2><p>Rollback means reverting to the previous binary, plus the daemon restart that comes with it. There is
+provisioned it, while <code>--kine-port</code> is per server. A control plane whose servers used different
+datastore ports would have a policy that names one of them, and a Service on another server&rsquo;s port
+would be admitted by the API and still unreachable from the pods on that server&rsquo;s node. A
+multi-server control plane is not available in v0.1.6 (see <a href=/docs/ha/>HA</a>).</p><h2 id=rollback>Rollback<a class=anchor href=#rollback aria-label="permalink to this section">#</a></h2><p>Rollback means reverting to the previous binary, plus the daemon restart that comes with it. There is
 no runtime flag to flip. On the script channel that is <code>K3SM_INSTALL_VERSION=&lt;prior-tag></code> and a
 re-run. On the planned Homebrew channel it will be a <code>brew</code> pin or a switch to the prior bottle.</p><p>If the release you are leaving changed the <strong>datastore engine</strong>, reverting the binary is only half of
 it, because the database has already been migrated in place. Restore the

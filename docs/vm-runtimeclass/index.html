@@ -18,8 +18,10 @@ in its own micro-VM. It supports boot and restart, <code>kubectl logs</code> wit
 PersistentVolumeClaim storage that survives a hard hypervisor kill, per-container CPU and memory
 accounting, and in-guest networking. The guest leases an address on the node&rsquo;s NAT segment,
 resolves cluster DNS, reaches ClusterIP Services, and is itself reachable through its own
-Service&rsquo;s ClusterIP on the same node. See <a href=/docs/limitations/>Limitations</a> for everything that was
-measured, including what is still not wired.</p><p>It ships <strong><code>linux/arm64</code> only</strong> (<code>linux/amd64</code> needs in-guest translation
+Service&rsquo;s ClusterIP on the same node, and at its pod IP on the ports it declares, through a relay on
+its node. Guest-to-guest reachability is still not a documented boundary, and the relay does not
+promise one. See <a href=/docs/limitations/>Limitations</a> for everything that was measured, including what is
+still not wired.</p><p>It ships <strong><code>linux/arm64</code> only</strong> (<code>linux/amd64</code> needs in-guest translation
 and is held for a later release); it passes against the release
 build. This path is single-node.</p></blockquote><h2 id=when-to-use-it>When to Use It<a class=anchor href=#when-to-use-it aria-label="permalink to this section">#</a></h2><p>Use <code>vm</code> when a workload must not share the <code>_k3sm</code> trust domain with its neighbors: untrusted code,
 tenant isolation, or anything you would isolate with a strong boundary on Linux. See

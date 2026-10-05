@@ -14,7 +14,11 @@ preview-quality until then. See <a href=/docs/limitations/>Limitations</a>.</p><
 Kubelet node. Nodes are connected by a <strong>wireguard mesh</strong> (the <code>MeshPeer</code> model), so Pods and Services
 can be reached across machines.</p><h2 id=serving-the-control-plane-from-this-mac>Serving the control plane from this Mac<a class=anchor href=#serving-the-control-plane-from-this-mac aria-label="permalink to this section">#</a></h2><p>The Mac that runs <code>k3sm server</code> needs to know its own wireguard mesh address before other nodes
 can join it. Set it with <code>--mesh-ip</code> at install time:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>sudo k3sm install --mesh-ip &lt;this-macs-mesh-address&gt;
-</span></span></code></pre></div><p>The mesh address is IPv4 (the default mesh range is 100.64.0.0/10); a link-local or IPv6 address is refused at install time.</p><p>This writes the address into the server daemon&rsquo;s arguments and restarts it. A plain <code>sudo k3sm install</code> re-run already boots the daemons out and back in, so it always picks up the address you
+</span></span></code></pre></div><p>The mesh address is IPv4 (the default mesh range is 100.64.0.0/10); a link-local or IPv6 address is refused at install time.
+It must be the first address (<code>.1</code>) of a /24 inside that range that no other node uses, such as
+100.64.0.1; the install refuses any other address, because that /24 becomes this Mac&rsquo;s pod range.
+In an <a href=/docs/ha/>HA</a> cluster every server works this way: each server&rsquo;s <code>--mesh-ip</code> names its own /24,
+and a server joining with a range another node already holds is refused rather than taking it.</p><p>This writes the address into the server daemon&rsquo;s arguments and restarts it. A plain <code>sudo k3sm install</code> re-run already boots the daemons out and back in, so it always picks up the address you
 gave it; there is no need to edit the installed launchd plist by hand, and doing so would not
 survive the next install anyway (<code>launchctl kickstart</code> alone never re-reads a plist, only a
 bootout and bootstrap does, which is what install performs).</p><p>Running <code>sudo k3sm install --mesh-ip &lt;new-address></code> again later replaces the stored address with
@@ -34,18 +38,27 @@ default; there is no flag to change that range). The server assigns that address
 and issues the node&rsquo;s certificates for it, so there is nothing you have to supply: pass
 <code>--node-ip &lt;this-macs-mesh-address></code> only to assert the address you expect. A value that differs
 from the one the server assigns fails the join with a message naming both, instead of bringing the
-node up on an address it does not hold.</p><p>A node that joined with a wrong <code>--node-ip</code> before this release still holds a certificate issued for
+node up on an address it does not hold.</p><p>On a control-plane install <code>--node-ip</code> means something else. There it is accepted only with
+<code>--cluster-init</code> or <code>--server-join</code>, and it names the Mac&rsquo;s own <strong>LAN</strong> address, which the embedded
+etcd member binds and the other servers dial. The install passes it to the server daemon as
+<code>--etcd-peer-ip</code>; the server&rsquo;s node still advertises its <code>--mesh-ip</code>, so the LAN address is never
+added to the loopback interface. See <a href=/docs/ha/>HA</a>.</p><p>A node that joined with a wrong <code>--node-ip</code> before this release still holds a certificate issued for
 that address, and the control plane cannot reach its kubelet, so <code>kubectl logs</code> and <code>kubectl exec</code>
 against it fail. <code>k3sm status</code> on that Mac now reports the agent row as an address mismatch and
 names the two addresses in the agent log. The fix is to rejoin with a fresh token, which re-issues
 the certificate for the address the server assigns.</p><p>To predict the address before you join, run this on the server Mac:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>k3sm kubectl get meshpeers
 </span></span></code></pre></div><p>Every node already in the mesh shows up here with a <code>PODCIDR</code> column, a /24 carved out of the mesh
-range in the order nodes joined: the first node holds <code>100.64.0.0/24</code>, the second <code>100.64.1.0/24</code>,
-and so on. The lowest number in the third position that is <strong>not</strong> already listed is the new
-node&rsquo;s index, and its mesh address is the first host address in that node&rsquo;s /24 (the address
+range: the first server holds <code>100.64.0.0/24</code>, and each worker takes the next free one in the order
+nodes joined. The lowest number above 0 in the third position that is <strong>not</strong> already listed is the
+new node&rsquo;s index, and its mesh address is the first host address in that node&rsquo;s /24 (the address
 ending in <code>.1</code>). For example: if <code>get meshpeers</code> lists one existing peer at <code>100.64.0.0/24</code>, the
 new node is index 1, its pod range is <code>100.64.1.0/24</code>, and the address it will be assigned is
-<code>100.64.1.1</code>.</p><p><code>--agent</code> installs the <code>io.k3sm.agent</code> LaunchDaemon, so the worker starts at boot and is restarted
+<code>100.64.1.1</code>. A worker is never given index 0, and never a range an <a href=/docs/ha/>HA</a> server holds or has
+reserved, so with a second server at <code>100.64.1.0/24</code> the next worker gets <code>100.64.2.0/24</code>. Each
+range is owned through a claim object (a <code>Lease</code> named <code>meshrange-&lt;n></code> in <code>kube-system</code>), and two
+servers answering joins at once cannot hand out the same range.</p><p>The join also returns the list of apiserver endpoints the worker may use: the server it joined
+through first, then any other server whose node is Ready. The worker keeps talking to the server it
+joined through.</p><p><code>--agent</code> installs the <code>io.k3sm.agent</code> LaunchDaemon, so the worker starts at boot and is restarted
 if it exits, exactly as the control plane is on the server Mac. A Mac is one role or the other: an
 install that would put the agent on a machine already running the control plane, or the other way
 round, is refused. Change a node&rsquo;s role with <code>sudo k3sm uninstall</code> and then install again. Uninstall
