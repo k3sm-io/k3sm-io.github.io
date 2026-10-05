@@ -21,7 +21,7 @@ shape.</li><li><strong>An <code>mlx.k3sm.io/gpu</code> extended resource</strong
 advertisement fails closed, so a node that cannot serve never claims it can. A Pod requests it
 the way any Pod requests an extended resource, <code>mlx.k3sm.io/gpu: 1</code> under <code>resources.limits</code>,
 and the upstream scheduler does the placement.</li></ul><p>The default engine behind an <code>MLXModel</code> is a published image, <code>ghcr.io/k3sm-io/mlx-serve</code>, and it
-speaks an OpenAI-compatible completions API. <code>kubectl get mlxmodels</code> lists what you have applied,
+speaks the common <code>/v1/chat/completions</code> HTTP API. <code>kubectl get mlxmodels</code> lists what you have applied,
 and a <code>Ready</code> condition means the same thing it means for any other workload. The Pod is up and the
 endpoint is answering.</p><h2 id=what-is-still-limited>What Is Still Limited<a class=anchor href=#what-is-still-limited aria-label="permalink to this section">#</a></h2><p>Two things keep this off most laptops today:</p><ul><li>You need an Apple-GPU-qualified Mac. A node only advertises <code>mlx.k3sm.io/gpu</code> when the probe
 behind it confirms the hardware, so most cloud runners and older machines never see the capacity.</li><li>You need the root install tier, the same <code>sudo k3sm install</code> step every other tutorial on this

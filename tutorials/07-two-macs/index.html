@@ -16,15 +16,21 @@ PersistentVolumeClaim that keeps its data across a pod restart, and a pod on the
 resolving cluster DNS and completing an authenticated apiserver call against the server.</p><h2 id=mesh-model>Mesh Model<a class=anchor href=#mesh-model aria-label="permalink to this section">#</a></h2><p>One Mac runs the control plane with <code>k3sm server</code>. Additional Macs join as agents running the
 Virtual Kubelet node. Nodes are connected by a wireguard mesh, so Pod and Service traffic can cross
 machines. Private keys never leave a node; the peer records held in the datastore carry public keys
-only.</p><h2 id=1-on-the-server-mac>1. On the Server Mac<a class=anchor href=#1-on-the-server-mac aria-label="permalink to this section">#</a></h2><p>Start the server with a mesh address so it can accept joins:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>k3sm server --mesh-ip &lt;address&gt;
+only.</p><h2 id=1-on-the-server-mac>1. On the Server Mac<a class=anchor href=#1-on-the-server-mac aria-label="permalink to this section">#</a></h2><p>Give the install its own mesh address so other nodes can join it:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>sudo k3sm install --mesh-ip &lt;this-macs-mesh-address&gt;
 </span></span></code></pre></div><p>Then mint a join token:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>sudo k3sm token create
 </span></span></code></pre></div><p>Run that one with <code>sudo</code>. The token pins the hash of the cluster CA, which lives in the
 control-plane state root owned by the <code>_k3sm</code> service user. Without <code>sudo</code> the work directory
-resolves to your own home and the command exits non-zero rather than inventing a CA there.</p><h2 id=2-on-the-second-mac>2. On the Second Mac<a class=anchor href=#2-on-the-second-mac aria-label="permalink to this section">#</a></h2><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>sudo k3sm install
-</span></span><span class=line><span class=cl>k3sm agent --server &lt;server-host&gt; --node-ip &lt;this-mac-ip&gt; --token &lt;token&gt;
-</span></span></code></pre></div><p><code>--server</code> takes the server Mac&rsquo;s bare hostname or IP, with no scheme and no port. The join dials
-<code>&lt;server-host>:9345</code>. <code>--node-ip</code> is required. It is this Mac&rsquo;s own address on the network the mesh
-rides, the one the server and other nodes reach it at.</p><p>The agent presents the bootstrap token, receives its node credentials, and registers its wireguard
+resolves to your own home and the command exits non-zero rather than inventing a CA there.</p><p>The control plane only starts accepting joins once its own mesh enrolment has finished, and that
+can take up to a minute after the install command returns. If step 2 reports that the control plane
+cannot be reached, wait a little and run it again.</p><h2 id=2-on-the-second-mac>2. On the Second Mac<a class=anchor href=#2-on-the-second-mac aria-label="permalink to this section">#</a></h2><p>Put the token from step 1 in a file only root can read:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>sudo sh -c <span class=s1>&#39;umask 077; cat &gt; /var/root/k3sm-join-token&#39;</span>
+</span></span></code></pre></div><p>Paste the token, then press Ctrl-D. Now install and join in one step:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>sudo k3sm install --agent --server &lt;server-lan-ip-or-name&gt; --token-file /var/root/k3sm-join-token
+</span></span></code></pre></div><p><code>--server</code> is the control-plane Mac&rsquo;s own <strong>LAN</strong> address (an underlay IP or hostname, no scheme,
+no port); the join dials it on <code>9345</code>, before this Mac has any mesh to route over. <code>--node-ip</code> is
+optional and, when given, is this Mac&rsquo;s <strong>mesh</strong> address instead: the join assigns that address
+itself, so pass <code>--node-ip</code> only to assert the value you expect. The token file must not be group-
+or world-readable, and once the node shows <code>Ready</code> it is yours to delete. See
+<a href=/docs/multi-node/>multi-node</a> for predicting or asserting the mesh address a joining node will
+get.</p><p>The agent presents the bootstrap token, receives its node credentials, and registers its wireguard
 public key as a mesh peer.</p><h2 id=3-confirm>3. Confirm<a class=anchor href=#3-confirm aria-label="permalink to this section">#</a></h2><p>From the server Mac:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>k3sm kubectl get nodes -o wide
 </span></span></code></pre></div><p>Both Macs appear as ready nodes, and a Service resolves to backends on either
 one. If the join fails, re-mint the token (tokens expire) and confirm the agent can
