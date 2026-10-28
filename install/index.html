@@ -17,6 +17,8 @@
     --line:#e4e6ea;
     --grid:rgba(0,0,0,.035);
     --accent:#3b5bdb;
+    --accent-hover:#2f4bc0;
+    --on-accent:#ffffff;
     --glow:rgba(59,91,219,.06);
   }
   @media (prefers-color-scheme: dark){
@@ -27,6 +29,8 @@
       --line:#23262c;
       --grid:rgba(255,255,255,.035);
       --accent:#6d8bff;
+      --accent-hover:#93a9ff;
+      --on-accent:#0a0b0d;
       --glow:rgba(109,139,255,.10);
     }
   }
@@ -98,6 +102,17 @@
   }
   .note p{margin:0}
   .hash{word-break:break-all}
+  .app{display:flex;align-items:center;gap:20px;margin:22px 0 30px;padding:20px;border:1px solid var(--line);border-radius:8px}
+  .app img{flex:none;width:72px;height:72px}
+  .app p{margin:12px 0 0;font-size:14px}
+  .dl{
+    display:inline-flex;align-items:center;gap:10px;padding:14px 26px;
+    border-radius:8px;background:var(--accent);color:var(--on-accent);
+    font-weight:600;font-size:17px;line-height:1.2;text-decoration:none;white-space:nowrap;
+  }
+  .dl:hover{background:var(--accent-hover)}
+  .dl:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  .dl svg{flex:none;width:18px;height:18px}
   .bottom{color:var(--muted);font-size:13px;letter-spacing:.02em}
 </style>
 </head>
@@ -109,13 +124,28 @@
   <hr class="rule">
   <section class="content">
     <h1>Install</h1>
-    <p>One line. Apple&nbsp;silicon, macOS&nbsp;26 or newer.</p>
+    <div class="app">
+      <img src="/img/app/k3sm-app-icon-128.png" srcset="/img/app/k3sm-app-icon-128.png 1x, /img/app/k3sm-app-icon-256.png 2x" width="72" height="72" alt="k3sm app icon">
+      <div>
+        <a class="dl" href="https://github.com/k3sm-io/k3sm/releases/latest/download/k3sm_darwin_arm64.dmg"><svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><path d="M10 3v9M6 8l4 4 4-4M3 12v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Download for Mac</span></a>
+        <p>The k3sm app, for Apple&nbsp;silicon and macOS&nbsp;26 or newer, Developer&nbsp;ID signed and notarized by Apple.</p>
+      </div>
+    </div>
+    <p>Or from the terminal, in one line. Apple&nbsp;silicon, macOS&nbsp;26 or newer.</p>
     <pre><code>curl -fsSL https://k3sm.io/install.sh | sh</code></pre>
+    <p>To look first, download and verify without installing:</p>
+    <pre><code>curl -fsSL https://k3sm.io/install.sh | K3SM_INSTALL_DOWNLOAD_ONLY=1 sh</code></pre>
+    <p>That downloads and SHA-256-verifies the tarball into the current directory and never
+    invokes <code>sudo</code>. Inspect it, then <code>tar -xzf</code> and run
+    <code>sudo ./k3sm install</code> yourself.</p>
+    <p>To install a specific release, pin it:</p>
+    <pre><code>curl -fsSL https://k3sm.io/install.sh | K3SM_INSTALL_VERSION=v0.2.2 sh</code></pre>
 
     <div class="note">
-      <p><strong>Status:</strong> pre-release builds are published; the script resolves the
-      newest one, and a pin via <code>K3SM_INSTALL_VERSION</code> always wins. The Homebrew
-      tap and the <code>.pkg</code> arrive with the first stable release.</p>
+      <p><strong>Status:</strong> every program in the release tarball is Developer&nbsp;ID
+      signed and notarized by Apple. The script resolves the newest release, and a pin via
+      <code>K3SM_INSTALL_VERSION</code> always wins. The <a href="/releases/">releases page</a>
+      lists every version you can pin.</p>
     </div>
 
     <h2>What the script does</h2>
@@ -139,45 +169,38 @@
     <div class="note">
       <p><strong>This script escalates.</strong> Step 5 runs under <code>sudo</code> and will
       prompt for your password (unless your sudo credentials are already cached; the banner
-      in step 4 prints either way). If you would rather look first, verify without
-      installing:</p>
+      in step 4 prints either way). If you would rather look first, use the download-only
+      form at the top of this page.</p>
     </div>
-    <pre><code>curl -fsSL https://k3sm.io/install.sh | K3SM_INSTALL_DOWNLOAD_ONLY=1 sh</code></pre>
-    <p>That downloads and SHA-256-verifies the tarball into the current directory and never
-    invokes <code>sudo</code>. Inspect it, then <code>tar -xzf</code> and run
-    <code>sudo ./k3sm install</code> yourself. You can also read the script itself. Its
-    SHA-256 as served here is:</p>
-    <p class="hash"><code>dd2c6b36e8047ecbf5bf489b2194980cce7909e585811c428953d1f6a4975f48</code></p>
+    <p>You can also read the script itself. Its SHA-256 as served here is:</p>
+    <p class="hash"><code>97d573656c23a771b1cfcc2f53e10df8109e299abc22381a728dbfa0edd940f5</code></p>
     <p>and the canonical copy lives at
     <code>github.com/k3sm-io/k3sm/install.sh</code>, same bytes from a different origin, so the
     two can be compared out-of-band.</p>
     <p><strong>Verification scope:</strong> the SHA-256 check confirms integrity (the tarball
-    matches its published checksums), not publisher identity. Identity (Developer&nbsp;ID +
-    notarization) arrives with the <code>.pkg</code> generation below.</p>
+    matches its published checksums), not publisher identity. Identity comes from the
+    Developer&nbsp;ID signature on each program in the tarball, which
+    <code>codesign -dvv</code> prints (<a href="/security/#verifying-a-download">verifying a
+    download</a>).</p>
 
     <h2>Upgrades, repair, rollback</h2>
     <ul>
       <li><strong>Upgrade:</strong> re-run the one-liner. Both LaunchDaemons restart briefly;
         cluster state is preserved.</li>
       <li><strong>Repair without upgrading:</strong> an unpinned re-run jumps to latest, so pin
-        the version you are on:
-        <code>K3SM_INSTALL_VERSION=v0.1.0&nbsp;sh</code>.</li>
+        the version you are on with the pinned form at the top of this page.</li>
       <li><strong>Rollback:</strong> pin the prior release tag and re-run.</li>
       <li><strong>Remove:</strong> <code>sudo k3sm uninstall</code> removes everything the
         install created (it is idempotent, and safe after a failed or partial install).</li>
     </ul>
 
-    <h2>The three generations</h2>
-    <p>This installer is <strong>generation&nbsp;1</strong> of k3sm&rsquo;s distribution
-    ladder, and it ships first:</p>
+    <h2>The two channels</h2>
     <ol>
       <li><code>curl -fsSL https://k3sm.io/install.sh | sh</code>: a checksum-verified
         tarball, handed to the first-class <code>sudo k3sm install</code>.</li>
-      <li><code>brew install k3sm-io/tap/k3sm</code>: the Homebrew tap.</li>
-      <li>A signed, notarized, stapled <code>.pkg</code>: full publisher provenance, for
-        offline and managed installs.</li>
+      <li>The k3sm app, a signed and notarized download from k3sm.io.</li>
     </ol>
-    <p><strong>Switching channels</strong> (script&nbsp;&rarr;&nbsp;brew or back) is safe:
+    <p><strong>Switching channels</strong> (from one channel to another) is safe:
     every channel manages the same <code>/Library/k3sm</code>. Run
     <code>sudo k3sm install</code> after switching so the daemons run the newly delivered
     binary, or run <code>sudo k3sm uninstall</code> first for a clean cutover.</p>
