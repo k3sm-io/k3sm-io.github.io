@@ -227,9 +227,10 @@ never copies anything on its own: run the copy there by hand, with <code>sudo</c
 hand on the server too to retry:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>sudo k3sm image migrate            <span class=c1># copy, then print the report</span>
 </span></span><span class=line><span class=cl>sudo k3sm image migrate --report   <span class=c1># print the last report without running</span>
 </span></span><span class=line><span class=cl>sudo k3sm image migrate -o json    <span class=c1># the report as JSON</span></span></span></code></pre></div><p><code>sudo</code> is needed because the copy reads the node&rsquo;s image store through the runtime&rsquo;s socket, which
-only root and the k3sm service user can open, as for <code>k3sm image prune</code>. On a worker, <code>--report</code>
-needs it too, since the journal there is readable by root only; without <code>sudo</code> the command stops and
-says so. A copy you run pushes the
+only root and the k3sm service user can open, as for <code>k3sm image prune</code>. <code>--report</code> needs it too,
+since the journal it prints is readable by root only. Without <code>sudo</code>, on a server <code>--report</code> prints
+the summary <code>k3sm status</code> shows (the state and the counts) and says the per-image report needs
+<code>sudo</code>, and <code>-o json</code> stops and says so; on a worker the command stops and says so. A copy you run pushes the
 way <code>k3sm build --push</code> does: through the push gate, with a builder token minted from your
 kubeconfig, to the server&rsquo;s loopback gate on the server and to the server&rsquo;s cluster address on a
 worker. So on a worker you need the kubeconfig described in

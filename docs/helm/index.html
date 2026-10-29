@@ -30,10 +30,10 @@ uninstalled.</p><p>The API is <code>helm.k3sm.io/v1</code>, a copy of k3s&rsquo;
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>ui.message</span><span class=p>:</span><span class=w> </span><span class=l>hello</span></span></span></code></pre></div><p>Apply it with <code>kubectl apply</code>, or drop the file into the auto-deploy directory,
 <code>/var/lib/k3sm/manifests</code> (see <a href=/docs/install/>Installation</a>), exactly as you would drop it into
 k3s&rsquo;s <code>server/manifests</code>.</p><h2 id=what-runs>What Runs<a class=anchor href=#what-runs aria-label="permalink to this section">#</a></h2><ul><li>The server runs a helm controller. It creates a Job named <code>helm-install-&lt;name></code> in the
-HelmChart&rsquo;s namespace, and on deletion a Job named <code>helm-delete-&lt;name></code>.</li><li>The Job is a native pod. Its command is the pinned <code>helm</code> (v4.3.0) that ships in the k3sm payload
+HelmChart&rsquo;s namespace, and on deletion a Job named <code>helm-delete-&lt;name></code>.</li><li>The Job is a native pod. Its command is the pinned <code>helm</code> (v4.3.1) that ships in the k3sm payload
 beside <code>kubectl</code>; there is no helm container image. k3sm builds that <code>helm</code> from helm&rsquo;s own module
-source at the pinned tag, with the Go release it pins for every binary it builds and with newer
-<code>golang.org/x/crypto</code> and <code>golang.org/x/net</code> than helm&rsquo;s release names, so it reports the same
+source at the pinned tag, with the Go release it pins for every binary it builds and with a newer
+<code>golang.org/x/net</code> than helm&rsquo;s release names, so it reports the same
 <code>helm version</code> as the upstream release and carries fixes released after that build.</li><li>The release is named after the HelmChart and installed into <code>targetNamespace</code>, or the HelmChart&rsquo;s
 own namespace when that is empty.</li><li>The Job runs <code>helm upgrade --install</code> with <code>--wait</code> and <code>--timeout</code> (<code>spec.timeout</code>, default
 <code>5m0s</code>). <code>valuesContent</code> is passed as a values file, then the HelmChartConfig overlay, then each

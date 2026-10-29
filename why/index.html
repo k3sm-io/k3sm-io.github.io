@@ -58,8 +58,9 @@ is a hint: each node enforces it for Service ingress to its own Pods, and direct
 bypasses it.</li><li>The resource model is best-effort. Memory is sampled and can drive an OOMKill, while CPU is QoS,
 not CFS millicores, so CPU <code>limits</code> are not enforced. Under memory pressure the node evicts one
 Pod at a time, ranked as the kubelet ranks them; there is no disk or PID eviction.</li><li>A native Pod cannot reach the login keychain, so Developer ID signing and notarization run on
-the host.</li><li>The current release is v0.2.2, and the install script installs the newest release.
-<a href=/install/>install</a> has what the script verifies and how a download&rsquo;s signature is checked.</li></ul><p>The full list is <a href=/docs/limitations/>limitations</a>; the fair side-by-side against the VM-based
+the host.</li><li>The current release is v0.2.3, and the install script installs the newest release.
+<a href=/docs/install/>install</a> has what the script verifies, and <a href=/security/#verifying-a-download>security</a>
+says how a download&rsquo;s signature is checked.</li></ul><p>The full list is <a href=/docs/limitations/>limitations</a>; the fair side-by-side against the VM-based
 options is <a href=/compare/>compare</a>.</p><h2 id=who-this-is-for>Who This Is For<a class=anchor href=#who-this-is-for aria-label="permalink to this section">#</a></h2><p>For an amd64 Linux container, or for mature Linux support, use a Linux VM. An arm64 Linux image
 can run here too, via the <code>vm</code> RuntimeClass. k3sm is for work that needs the Mac itself: a build
 farm, a CI fleet of Mac minis, on-device model serving, or any service that

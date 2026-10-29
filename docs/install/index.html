@@ -74,7 +74,7 @@ identity, but the programs in the tarball are Developer ID signed and notarized,
 <code>codesign --verify --strict /Library/k3sm/k3sm</code> checks that after install. Environment variables set the
 options. <code>K3SM_INSTALL_VERSION</code> pins a release, and it is also the repair path, since an
 unpinned re-run jumps to latest. The variable must reach <code>sh</code>, so it goes after the pipe:
-<code>curl -fsSL https://k3sm.io/install.sh | K3SM_INSTALL_VERSION=v0.2.2 sh</code> (v0.2.2 is the release you are on
+<code>curl -fsSL https://k3sm.io/install.sh | K3SM_INSTALL_VERSION=v0.2.3 sh</code> (v0.2.3 is the release you are on
 today, so a repair pins the newest tag and never an older one; the <a href=https://k3sm.io/releases/ rel="noopener external">releases page</a> lists every version you can pin).
 <code>K3SM_INSTALL_DOWNLOAD_ONLY=1</code> downloads and verifies into
 the current directory without ever running <code>sudo</code>, so you can inspect first. Re-running the

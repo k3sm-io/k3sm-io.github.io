@@ -27,7 +27,8 @@ not do.</li><li><a href=/docs/backup-restore/>Backup and restore</a> covers the 
 workloads; it boots <code>linux/arm64</code> images per Pod today.</li><li><a href=/docs/mlx-quickstart/>MLX serving</a> walks through serving a model on the Mac&rsquo;s GPU through an
 <code>/v1/chat/completions</code> endpoint.</li><li><a href=/docs/temporal-example/>A Linux server under the vm RuntimeClass</a> runs a durable-execution
 server&rsquo;s <code>linux/arm64</code> images in per-Pod micro-VMs and talks to it from a native client.</li><li><a href=/docs/interconnects/>Interconnects</a> covers a Thunderbolt cable between Macs as an opt-in network
-for Pods that ask for it, the MLX ranks of a sharded model above all.</li><li><a href=/docs/limitations/>Limitations</a> lists the gaps.</li><li><a href=/docs/troubleshooting/>Troubleshooting</a> covers the node&rsquo;s own daemon logs, common failures, and
+for Pods that ask for it, the MLX ranks of a sharded model above all.</li><li><a href=/docs/limitations/>Limitations</a> lists the gaps.</li><li><a href=/docs/conformance-profile/>Conformance profile</a> is the self-assessment of what k3sm targets and why it
+is not a CNCF <code>[Conformance]</code> pass.</li><li><a href=/docs/troubleshooting/>Troubleshooting</a> covers the node&rsquo;s own daemon logs, common failures, and
 recovery.</li><li><a href=/docs/status-json/>Status JSON</a> is the contract for <code>k3sm status -o json</code> and the cheap
 <code>k3sm status daemons -o json</code> probe: fields, enums, versioning and exit codes.</li><li><a href=/docs/logs/>Container logs</a> covers where a Pod&rsquo;s output is written, <code>kubectl logs</code> and its
 options, rotation, and how to ship logs off a node.</li><li><a href=/docs/stop-start/>Stopping and starting</a> covers <code>k3sm stop</code>, <code>start</code> and <code>restart</code>, what a stop does
